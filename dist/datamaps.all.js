@@ -244,20 +244,12 @@
           var $this = d3.select(this);
           var datum = self.options.data[d.id] || {};
           if ( options.highlightOnHover ) {
-            var previousAttributes = {
-              'fill':  $this.style('fill'),
-              'stroke': $this.style('stroke'),
-              'stroke-width': $this.style('stroke-width'),
-              'fill-opacity': $this.style('fill-opacity')
-            };
-
             $this
               .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
               .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
               .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
               .style('stroke-opacity', val(datum.highlightBorderOpacity, options.highlightBorderOpacity, datum))
-              .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum))
-              .attr('data-previousAttributes', JSON.stringify(previousAttributes));
+              .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum));
 
             // As per discussion on https://github.com/markmarkoh/datamaps/issues/19
             if ( ! /((MSIE)|(Trident))/.test(navigator.userAgent) ) {
@@ -269,15 +261,12 @@
             self.updatePopup($this, d, options, svg);
           }
         })
-        .on('mouseout', function() {
+        .on('mouseout', function(d) {
           var $this = d3.select(this);
 
           if (options.highlightOnHover) {
-            // Reapply previous attributes
-            var previousAttributes = JSON.parse( $this.attr('data-previousAttributes') );
-            for ( var attr in previousAttributes ) {
-              $this.style(attr, previousAttributes[attr]);
-            }
+            // Reapply previous attributes by re-render Subunit
+            self.renderSubunit(d.id);
           }
           $this.on('mousemove', null);
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
@@ -382,6 +371,9 @@
                    case "CHL":
                        originXY = self.latLngToXY(-33.448890, -70.669265);
                        break;
+                   case "HRV":
+                       originXY = self.latLngToXY(45.815011, 15.981919);
+                       break;
                    case "IDN":
                        originXY = self.latLngToXY(-6.208763, 106.845599);
                        break;
@@ -409,11 +401,14 @@
 
             if (typeof datum.destination === 'string') {
               switch (datum.destination) {
-                     case "CAN":
+                    case "CAN":
                         destXY = self.latLngToXY(56.624472, -114.665293);
                         break;
                     case "CHL":
                         destXY = self.latLngToXY(-33.448890, -70.669265);
+                        break;
+                    case "HRV":
+                        destXY = self.latLngToXY(45.815011, 15.981919);
                         break;
                     case "IDN":
                         destXY = self.latLngToXY(-6.208763, 106.845599);
@@ -12546,6 +12541,8 @@
   Datamap.prototype.updateChoropleth = function(data, options) {
     var svg = this.svg;
     var that = this;
+    // Save data so we could use it later for re-render
+    this.data = data;
 
     // When options.reset = true, reset all the fill colors to the defaultFill and kill all data-info
     if ( options && options.reset === true ) {
@@ -12557,35 +12554,43 @@
     }
 
     for ( var subunit in data ) {
-      if ( data.hasOwnProperty(subunit) ) {
-        var color;
-        var subunitData = data[subunit]
-        if ( ! subunit ) {
-          continue;
-        }
-        else if ( typeof subunitData === "string" ) {
-          color = subunitData;
-        }
-        else if ( typeof subunitData.color === "string" ) {
-          color = subunitData.color;
-        }
-        else if ( typeof subunitData.fillColor === "string" ) {
-          color = subunitData.fillColor;
-        }
-        else {
-          color = this.options.fills[ subunitData.fillKey ];
-        }
-        // If it's an object, overriding the previous data
-        if ( subunitData === Object(subunitData) ) {
-          this.options.data[subunit] = defaults(subunitData, this.options.data[subunit] || {});
-          var geo = this.svg.select('.' + subunit).attr('data-info', JSON.stringify(this.options.data[subunit]));
-        }
-        svg
-          .selectAll('.' + subunit)
-          .transition()
-            .style('fill', color);
+      this.renderSubunit(subunit);
+    }
+  };
+
+  Datamap.prototype.renderSubunit = function(subunit) {
+    var color = this.options.fills.defaultFill;
+    if (subunit && this.data.hasOwnProperty(subunit)) {
+      var subunitData = this.data[subunit];
+
+      if (typeof subunitData === "string") {
+        color = subunitData;
+      } else if (typeof subunitData.color === "string") {
+        color = subunitData.color;
+      } else if (typeof subunitData.fillColor === "string") {
+        color = subunitData.fillColor;
+      } else {
+        color = this.options.fills[subunitData.fillKey];
+      }
+      // If it's an object, overriding the previous data
+      if (subunitData === Object(subunitData)) {
+        this.options.data[subunit] = defaults(
+          subunitData,
+          this.options.data[subunit] || {}
+        );
+        var geo = this.svg
+          .select("." + subunit)
+          .attr("data-info", JSON.stringify(this.options.data[subunit]));
       }
     }
+
+    this.svg
+      .selectAll("." + subunit)
+      .transition()
+      .style("stroke", null)
+      .style("stroke-width", null)
+      .style("fill-opacity")
+      .style("fill", color);
   };
 
   Datamap.prototype.updatePopup = function (element, d, options) {
