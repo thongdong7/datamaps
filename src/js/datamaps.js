@@ -1099,37 +1099,38 @@
 
   Datamap.prototype.renderSubunit = function(subunit) {
     var color = this.options.fills.defaultFill;
-    if ( subunit && this.data.hasOwnProperty(subunit) ) {
-        var subunitData = this.data[subunit]
-        
-        if ( typeof subunitData === "string" ) {
-            color = subunitData;
-        }
-        else if ( typeof subunitData.color === "string" ) {
-            color = subunitData.color;
-        }
-        else if ( typeof subunitData.fillColor === "string" ) {
-            color = subunitData.fillColor;
-        }
-        else {
-            color = this.options.fills[ subunitData.fillKey ];
-        }
-        // If it's an object, overriding the previous data
-        if ( subunitData === Object(subunitData) ) {
-            this.options.data[subunit] = defaults(subunitData, this.options.data[subunit] || {});
-            var geo = this.svg.select('.' + subunit).attr('data-info', JSON.stringify(this.options.data[subunit]));
-        }
+    if (subunit && this.data.hasOwnProperty(subunit)) {
+      var subunitData = this.data[subunit];
+
+      if (typeof subunitData === "string") {
+        color = subunitData;
+      } else if (typeof subunitData.color === "string") {
+        color = subunitData.color;
+      } else if (typeof subunitData.fillColor === "string") {
+        color = subunitData.fillColor;
+      } else {
+        color = this.options.fills[subunitData.fillKey];
+      }
+      // If it's an object, overriding the previous data
+      if (subunitData === Object(subunitData)) {
+        this.options.data[subunit] = defaults(
+          subunitData,
+          this.options.data[subunit] || {}
+        );
+        var geo = this.svg
+          .select("." + subunit)
+          .attr("data-info", JSON.stringify(this.options.data[subunit]));
+      }
     }
-    
+
     this.svg
-        .selectAll('.' + subunit)
-        .transition()
-        .style('stroke', null)
-        .style('stroke-width', null)
-        .style('fill-opacity')
-        .style('fill', color)
-        ;
-  }
+      .selectAll("." + subunit)
+      .transition()
+      .style("stroke", null)
+      .style("stroke-width", null)
+      .style("fill-opacity")
+      .style("fill", color);
+  };
 
   Datamap.prototype.updatePopup = function (element, d, options) {
     var self = this;
