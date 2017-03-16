@@ -1100,8 +1100,9 @@
 
   Datamap.prototype.renderSubunit = function(subunit) {
     var color = this.options.fills.defaultFill;
-    if (subunit && this.data.hasOwnProperty(subunit)) {
-      var subunitData = this.data[subunit];
+    const data = this.data || this.options.data;
+    if (subunit && data.hasOwnProperty(subunit)) {
+      var subunitData = data[subunit];
 
       if (typeof subunitData === "string") {
         color = subunitData;
