@@ -29,6 +29,7 @@
         },
         popupOnHover: true,
         highlightOnHover: true,
+        highlightFillColorOnHover: true,
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
@@ -244,8 +245,12 @@
           var $this = d3.select(this);
           var datum = self.options.data[d.id] || {};
           if ( options.highlightOnHover ) {
+            if (options.highlightFillColorOnHover) {
+              $this
+                .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
+            }
+
             $this
-              .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
               .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
               .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
               .style('stroke-opacity', val(datum.highlightBorderOpacity, options.highlightBorderOpacity, datum))
@@ -622,8 +627,12 @@
               'fill-opacity': $this.style('fill-opacity')
             };
 
+            if (options.highlightFillColorOnHover) {
+              $this
+                .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum));
+            }
+
             $this
-              .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
               .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
               .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
               .style('stroke-opacity', val(datum.highlightBorderOpacity, options.highlightBorderOpacity, datum))
@@ -694,6 +703,7 @@
   ***************************************/
 
   function Datamap( options ) {
+    this.data = options.data;
 
     if ( typeof d3 === 'undefined' || typeof topojson === 'undefined' ) {
       throw new Error('Include d3.js (v3.0.3 or greater) and topojson on this page before creating a new map');
@@ -12560,9 +12570,8 @@
 
   Datamap.prototype.renderSubunit = function(subunit) {
     var color = this.options.fills.defaultFill;
-    const data = this.data || this.options.data;
-    if (subunit && data.hasOwnProperty(subunit)) {
-      var subunitData = data[subunit];
+    if (subunit && this.data && this.data.hasOwnProperty(subunit)) {
+      var subunitData = this.data[subunit];
 
       if (typeof subunitData === "string") {
         color = subunitData;
