@@ -17,7 +17,8 @@
     "url": "https://github.com/markmarkoh/datamaps.git"
   },
   "scripts": {
-    "test": "grunt jasmine"
+    "test": "grunt jasmine",
+    "build": "grunt build"
   },
   "dependencies": {
     "d3": "^3.5.6",
