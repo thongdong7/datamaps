@@ -1310,7 +1310,7 @@
                 "properties": {
                     "name": "Northern Cyprus"
                 },
-                "id": "-99",
+                "id": "CYN",
                 "arcs": [
                     [216, 217]
                 ]
@@ -1851,7 +1851,7 @@
                 "properties": {
                     "name": "Kosovo"
                 },
-                "id": "-99",
+                "id": "KOS",
                 "arcs": [
                     [-18, 405, 406, 407]
                 ]
@@ -2464,7 +2464,7 @@
                 "properties": {
                     "name": "Somaliland"
                 },
-                "id": "-99",
+                "id": "SOL",
                 "arcs": [
                     [-263, -231, 559, 560]
                 ]
