@@ -257,7 +257,7 @@
               .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum));
 
             // As per discussion on https://github.com/markmarkoh/datamaps/issues/19
-            if ( ! /((MSIE)|(Trident))/.test(navigator.userAgent) ) {
+            if ( ! /((MSIE)|(Trident)|(Edge))/.test(navigator.userAgent) ) {
              moveToFront.call(this);
             }
           }
