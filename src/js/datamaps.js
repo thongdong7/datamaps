@@ -1152,9 +1152,9 @@
       const onLeft = position[0] * 2 < width;
       const nextStyle = {
         top: onTop ? `${position[1] + 20}px` : "auto",
-        left: onLeft ? `${position[0] + 10}px` : "auto",
+        left: onLeft ? `${position[0] + 20}px` : "auto",
         bottom: !onTop ? `${height - position[1] + 20}px` : "auto",
-        right: !onLeft ? `${width - position[0] + 10}px` : "auto"
+        right: !onLeft ? `${width - position[0] + 20}px` : "auto"
       };
 
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
