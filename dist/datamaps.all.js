@@ -798,7 +798,7 @@
           hoverover = d3.select( self.options.element ).append('div')
             .attr('class', 'datamaps-hoverover')
             .style('z-index', 10001)
-            .style('position', 'fixed');
+            .style('position', 'absolute');
         }
 
         // Fire off finished callback
@@ -12608,10 +12608,18 @@
     element.on('mousemove', null);
     element.on('mousemove', function() {
       var position = d3.mouse(self.options.element);
-      var doc = document.documentElement;
-      var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+      var clientRect = self.options.element.getBoundingClientRect();
+      var width = clientRect.width, height = clientRect.height;
+      var onTop = position[1] * 2 < height;
+      var onLeft = position[0] * 2 < width;
+      var nextStyle = {
+        top: onTop ? position[1] + 20 + "px" : "auto",
+        left: onLeft ? position[0] + 20 + "px" : "auto",
+        bottom: !onTop ? height - position[1] + 20 + "px" : "auto",
+        right: !onLeft ? width - position[0] + 20 + "px" : "auto"
+      };
+
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
-        .style('top',  position[1] - top + 20 + "px")
         .html(function() {
           var data = JSON.parse(element.attr('data-info'));
           try {
@@ -12620,7 +12628,7 @@
             return "";
           }
         })
-        .style('left', position[0] + 20 + "px");
+        .style(nextStyle);
     });
 
     d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover').style('display', 'block');
